@@ -36,8 +36,32 @@ components:
         name: JAVA_OPTS
       - value: $(JAVA_OPTS)
         name: MAVEN_OPTS
-  - id: redhat/vscode-apache-camel/latest
-    type: chePlugin
+  - alias: postgresql
+    endpoints:
+      - name: postgresql
+        port: 5432
+    memoryLimit: 256Mi
+    type: dockerimage
+    image: 'registry.redhat.io/rhel8/postgresql-10:latest'
+    env:
+      - value: petclinic
+        name: POSTGRESQL_USER
+      - value: petclinic
+        name: POSTGRESQL_PASSWORD
+      - value: petclinic
+        name: POSTGRESQL_DATABASE
+  - alias: pgadmin4
+    endpoints:
+      - name: pgadmin4
+        port: 5050
+    memoryLimit: 256Mi
+    type: dockerimage
+    image: 'registry.connect.redhat.com/crunchydata/crunchy-pgadmin4:latest'
+    env:
+      - value: admin@example.com
+        name: PGADMIN_SETUP_EMAIL
+      - value: password
+        name: PGADMIN_SETUP_PASSWORD
 apiVersion: 1.0.0
 commands:
   - name: build
@@ -67,7 +91,7 @@ commands:
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/spring-petclinic'
         type: exec
-        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run'
+        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring.profiles.active=dev'
         component: maven
   - name: debug
     actions:
@@ -75,7 +99,7 @@ commands:
         type: exec
         command: >-
           mvn  -Duser.home=${HOME} spring-boot:run -Drun.jvmArguments="-Xdebug
-          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring.profiles.active=dev
         component: maven
   - name: test
     actions:
