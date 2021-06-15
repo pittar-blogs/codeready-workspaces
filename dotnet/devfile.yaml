@@ -1,0 +1,106 @@
+apiVersion: 1.0.0
+metadata:
+  name: dotnet
+projects:
+  - name: dotnet-app
+    source:
+      location: 'https://github.com/pittar-sandbox/dotnet-contoso-app'
+      startPoint: main
+      type: git
+components:
+  - id: redhat-developer/che-omnisharp-plugin/latest
+    type: chePlugin
+    alias: omnisharp
+  - id: redhat-developer/netcoredbg-theia-plugin/latest
+    type: chePlugin
+    alias: netcoredbg
+  - mountSources: true
+    endpoints:
+      - name: app-endpoint
+        port: 5000
+    memoryLimit: 512Mi
+    type: dockerimage
+    volumes:
+      - name: nuget
+        containerPath: /home/jboss/.nuget
+    alias: dotnet
+    image: 'registry.redhat.io/codeready-workspaces/stacks-dotnet-rhel8:2.8'
+  - alias: postgresql
+    endpoints:
+      - name: postgresql
+        port: 5432
+    memoryLimit: 512Mi
+    type: dockerimage
+    image: 'registry.redhat.io/rhel8/postgresql-10:latest'
+    env:
+      - value: admin
+        name: POSTGRESQL_USER
+      - value: password
+        name: POSTGRESQL_PASSWORD
+      - value: appdb
+        name: POSTGRESQL_DATABASE
+  - alias: pgadmin4
+    endpoints:
+      - name: pgadmin4
+        port: 5050
+    memoryLimit: 512Mi
+    type: dockerimage
+    image: 'registry.connect.redhat.com/crunchydata/crunchy-pgadmin4:latest'
+    env:
+      - value: apitt@redhat.com
+        name: PGADMIN_SETUP_EMAIL
+      - value: password
+        name: PGADMIN_SETUP_PASSWORD
+  - alias: mongodb
+    endpoints:
+      - name: mongodb
+        port: 27017
+    memoryLimit: 512Mi
+    type: dockerimage
+    volumes:
+      - name: mongo-1
+        containerPath: /data/configdb
+      - name: mongo-2
+        containerPath: /data/db
+    image: 'docker.io/mongo:4.0.25'
+    env:
+      - value: root
+        name: MONGO_INITDB_ROOT_USERNAME
+      - value: password
+        name: MONGO_INITDB_ROOT_PASSWORD
+  - alias: mongo-express
+    endpoints:
+      - name: mongo-express
+        port: 8081
+    memoryLimit: 512Mi
+    type: dockerimage
+    image: 'docker.io/mongo-express:0.54'
+    env:
+      - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+        value: root
+      - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+        value: password
+      - name: ME_CONFIG_MONGODB_SERVER
+        value: localhost
+  - type: kubernetes
+    reference: manifests/kafka.yaml
+    alias: kafka
+commands:
+  - name: 1. Update dependencies
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/dotnet-app'
+        type: exec
+        command: dotnet restore
+        component: dotnet
+  - name: 2. Build
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/dotnet-app'
+        type: exec
+        command: dotnet build
+        component: dotnet
+  - name: 3. Run
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/dotnet-app'
+        type: exec
+        command: dotnet run
+        component: dotnet
