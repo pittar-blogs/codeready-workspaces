@@ -36,20 +36,20 @@ components:
         name: JAVA_OPTS
       - value: $(JAVA_OPTS)
         name: MAVEN_OPTS
-  - alias: postgresql
+  - alias: mysql
     endpoints:
-      - name: postgresql
-        port: 5432
+      - name: mysql
+        port: 3306
     memoryLimit: 256Mi
     type: dockerimage
-    image: 'registry.redhat.io/rhel8/postgresql-10:latest'
+    image: 'registry.redhat.io/rhel8/mysql-80:latest'
     env:
       - value: petclinic
-        name: POSTGRESQL_USER
+        name: MYSQL_USER
       - value: petclinic
-        name: POSTGRESQL_PASSWORD
+        name: MYSQL_PASSWORD
       - value: petclinic
-        name: POSTGRESQL_DATABASE
+        name: MYSQL_DATABASE
 apiVersion: 1.0.0
 commands:
   - name: build
@@ -79,7 +79,7 @@ commands:
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/spring-petclinic'
         type: exec
-        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run'
+        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring-boot.run.profiles=mysql'
         component: maven
   - name: debug
     actions:
@@ -87,7 +87,7 @@ commands:
         type: exec
         command: >-
           mvn  -Duser.home=${HOME} spring-boot:run -Drun.jvmArguments="-Xdebug
-          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring-boot.run.profiles=mysql
         component: maven
   - name: test
     actions:
