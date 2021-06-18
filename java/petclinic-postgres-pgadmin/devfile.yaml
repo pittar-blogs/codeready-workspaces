@@ -50,6 +50,8 @@ components:
         name: POSTGRESQL_PASSWORD
       - value: petclinic
         name: POSTGRESQL_DATABASE
+      - value: petclinic
+        name: POSTGRESQL_ADMIN_PASSWORD
   - alias: pgadmin4
     endpoints:
       - name: pgadmin4
