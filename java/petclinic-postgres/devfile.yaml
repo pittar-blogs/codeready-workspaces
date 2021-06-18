@@ -17,7 +17,7 @@ components:
     type: chePlugin
   - mountSources: true
     endpoints:
-      - name: 8080-tcp
+      - name: petclinic-web
         port: 8080
     memoryLimit: 768Mi
     type: dockerimage
