@@ -43,9 +43,6 @@ components:
     memoryLimit: 256Mi
     type: dockerimage
     image: 'registry.redhat.io/rhel8/postgresql-10:latest'
-    volumes:
-      - name: pgdata
-        containerPath: /var/lib/pgsql/data
     env:
       - value: petclinic
         name: POSTGRESQL_USER
