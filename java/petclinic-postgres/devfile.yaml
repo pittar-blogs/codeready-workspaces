@@ -58,7 +58,7 @@ components:
     type: dockerimage
     image: 'docker.io/phpmyadmin:5.1'
     env:
-      - value: 1
+      - value: "1"
         name: PMA_ARBITRARY
 apiVersion: 1.0.0
 commands:
