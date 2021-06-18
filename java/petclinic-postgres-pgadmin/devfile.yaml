@@ -43,6 +43,9 @@ components:
     memoryLimit: 256Mi
     type: dockerimage
     image: 'registry.redhat.io/rhel8/postgresql-10:latest'
+    volumes:
+      - name: pgdata
+        containerPath: /var/lib/pgsql/data
     env:
       - value: petclinic
         name: POSTGRESQL_USER
@@ -93,7 +96,7 @@ commands:
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/spring-petclinic'
         type: exec
-        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring.profiles.active=dev'
+        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring-boot.run.profiles=postgresql'
         component: maven
   - name: debug
     actions:
@@ -101,7 +104,7 @@ commands:
         type: exec
         command: >-
           mvn  -Duser.home=${HOME} spring-boot:run -Drun.jvmArguments="-Xdebug
-          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring.profiles.active=dev
+          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring-boot.run.profiles=postgresql
         component: maven
   - name: test
     actions:
