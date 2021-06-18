@@ -40,7 +40,7 @@ components:
     endpoints:
       - name: mysql
         port: 3306
-    memoryLimit: 256Mi
+    memoryLimit: 512Mi
     type: dockerimage
     image: 'registry.redhat.io/rhel8/mysql-80:latest'
     env:
