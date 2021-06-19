@@ -50,16 +50,6 @@ components:
         name: MYSQL_PASSWORD
       - value: petclinic
         name: MYSQL_DATABASE
-  - alias: phpmyadmin
-    endpoints:
-      - name: phpmyadmin
-        port: 8080
-    memoryLimit: 512Mi
-    type: dockerimage
-    image: 'docker.io/phpmyadmin:5.1'
-    env:
-      - value: "1"
-        name: PMA_ARBITRARY
 apiVersion: 1.0.0
 commands:
   - name: build
@@ -89,7 +79,7 @@ commands:
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/spring-petclinic'
         type: exec
-        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring-boot.run.profiles=mysql --server.port=8081'
+        command: 'MAVEN_OPTS="-Xmx200m" && mvn -Duser.home=${HOME} spring-boot:run -Dspring-boot.run.profiles=mysql'
         component: maven
   - name: debug
     actions:
@@ -97,7 +87,7 @@ commands:
         type: exec
         command: >-
           mvn  -Duser.home=${HOME} spring-boot:run -Drun.jvmArguments="-Xdebug
-          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring-boot.run.profiles=mysql --server.port=8081
+          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" -Dspring-boot.run.profiles=mysql
         component: maven
   - name: test
     actions:
